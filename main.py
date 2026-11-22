@@ -11,17 +11,27 @@ import shutil
 TARGET_NAME = "entry.png"
 
 
+def bot_dir() -> str:
+    """Where the repository is mounted in the grader (/bot), or beside this file."""
+    return os.environ.get("MAKEFUN_BOT_DIR") or os.path.dirname(os.path.abspath(__file__))
+
+
 def output_dir() -> str:
-    """The sandbox's output directory; /output there, overridable for a local run."""
-    return os.environ.get("OUTPUT_DIR", "/output")
+    """The grader's writable output directory."""
+    return (
+        os.environ.get("MAKEFUN_OUTPUT_DIR")
+        or os.environ.get("OUTPUT_DIR")
+        or "/output"
+    )
 
 
 def main() -> None:
     out = output_dir()
     os.makedirs(out, exist_ok=True)
+    source = os.path.join(bot_dir(), TARGET_NAME)
     target = os.path.join(out, TARGET_NAME)
-    shutil.copyfile(TARGET_NAME, target)
-    print("wrote", target, os.path.getsize(target), "bytes")
+    shutil.copyfile(source, target)
+    print("copied", source, "->", target, os.path.getsize(target), "bytes")
 
 
 if __name__ == "__main__":
